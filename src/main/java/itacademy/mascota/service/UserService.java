@@ -2,6 +2,7 @@ package itacademy.mascota.service;
 
 
 
+import itacademy.mascota.configuration.JwtTokenUtil;
 import itacademy.mascota.model.User;
 import itacademy.mascota.repository.UserRepository;
 import itacademy.mascota.configuration.SecurityConfig;
@@ -30,7 +31,6 @@ public class UserService {
 
 
     public User registerUser(User user) {
-        // Codificar la contraseña antes de guardarla en la base de datos
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }

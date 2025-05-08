@@ -24,6 +24,7 @@ public class User implements UserDetails {
     @Column(unique = true)
     private String username;
     private String password;
+    private String token;
     private ArrayList<Pet> pets=new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER)

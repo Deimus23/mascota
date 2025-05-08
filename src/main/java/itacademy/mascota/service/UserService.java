@@ -1,11 +1,8 @@
 package itacademy.mascota.service;
 
-
-
 import itacademy.mascota.configuration.JwtTokenUtil;
 import itacademy.mascota.model.User;
 import itacademy.mascota.repository.UserRepository;
-import itacademy.mascota.configuration.SecurityConfig;
 import itacademy.mascota.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -42,9 +39,9 @@ public class UserService {
                 new UsernamePasswordAuthenticationToken(username, password)
         );
 
-
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        return jwtTokenUtil.generateToken(userDetails);
+
+        return jwtTokenUtil.generateToken(String.valueOf(userDetails));
     }
 }
 

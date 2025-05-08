@@ -1,7 +1,7 @@
 package itacademy.mascota.service;
 
-import itacademy.mascota.model.Pet;
 import itacademy.mascota.dto.PetDTO;
+import itacademy.mascota.model.Pet;
 import org.springframework.stereotype.Service;
 
 @Service

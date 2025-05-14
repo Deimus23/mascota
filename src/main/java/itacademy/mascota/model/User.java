@@ -4,11 +4,13 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -24,8 +26,8 @@ public class User implements UserDetails {
     @Column(unique = true)
     private String username;
     private String password;
-    private String token;
-    private ArrayList<Pet> pets=new ArrayList<>();
+    @OneToMany
+    private List<Pet> pets;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

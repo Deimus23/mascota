@@ -2,9 +2,13 @@ package itacademy.mascota.service;
 
 import itacademy.mascota.dto.PetDTO;
 import itacademy.mascota.model.Pet;
+import itacademy.mascota.model.User;
 import itacademy.mascota.repository.PetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,6 +18,8 @@ import java.util.stream.Collectors;
 
         @Autowired
         private PetRepository petRepository;
+        @Autowired
+        private AuthService authService;
 
         public List<PetDTO> getAllPets() {
             return petRepository.findAll().stream()
@@ -21,9 +27,18 @@ import java.util.stream.Collectors;
                     .collect(Collectors.toList());
         }
 
-        public Optional<PetDTO> getPetById(Long id) {
-            return petRepository.findById(id)
-                    .map(this::convertToDTO);
+        public PetDTO getPetById(Long id) {
+            Optional<Pet> petOptional = petRepository.findById(id);
+            if (petOptional.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            return this.convertToDTO(petOptional.get());
+        }
+
+        public List<PetDTO> getMyPets() {
+            User user = authService.getCurrentUser();
+            return user.getPets()
+                    .stream()
+                    .map(this::convertToDTO)
+                    .toList();
         }
 
         public PetDTO createPet(PetDTO petDTO) {
@@ -33,14 +48,16 @@ import java.util.stream.Collectors;
             return convertToDTO(saved);
         }
 
-        public Optional<PetDTO> updatePet(Long id, PetDTO petDTO) {
-            return petRepository.findById(id)
-                    .map(existingPet -> {
-                        updateEntityFromDTO(petDTO, existingPet);
-                        Pet updated = petRepository.save(existingPet);
-                        return convertToDTO(updated);
-                    });
+        public PetDTO updatePet(Long id, PetDTO petDTO) {
+            Optional<Pet> petOptional = petRepository.findById(id);
+            if (petOptional.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            Pet originalpet = petOptional.get();
+            originalpet.setPetType(petDTO.getPetType());
+            originalpet.setPetColor(petDTO.getPetColor());
+            Pet savedPet = petRepository.save(originalpet);
+            return convertToDTO(savedPet);
         }
+
 
         public boolean deletePet(Long id) {
             return petRepository.findById(id).map(pet -> {
@@ -88,17 +105,6 @@ import java.util.stream.Collectors;
             return pet;
         }
 
-        public void updateEntityFromDTO(PetDTO dto, Pet pet) {
-            pet.setName(dto.getName());
-            pet.setPetColor(dto.getPetColor());
-            pet.setPetType(dto.getPetType());
-            pet.setEnvironment(dto.getEnvironment());
-            pet.setComplement(dto.getComplement());
-            pet.setLife(dto.getLife());
-            pet.setHappiness(dto.getHappiness());
-            pet.setEnergy(dto.getEnergy());
-        }
     }
-
 
 

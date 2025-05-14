@@ -1,70 +1,49 @@
 package itacademy.mascota.controller;
 
-import itacademy.mascota.model.Pet;
+import itacademy.mascota.dto.PetDTO;
 import itacademy.mascota.repository.PetRepository;
+import itacademy.mascota.service.PetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/pets")
+@RequestMapping("/pets")
 public class PetController {
 
     @Autowired
     private PetRepository petRepository;
 
-    @GetMapping
-    public ResponseEntity<List<Pet>> getAllPets() {
-        return ResponseEntity.ok(petRepository.findAll());
-    }
+    @Autowired
+    private PetService petService;
 
+    @GetMapping
+    public ResponseEntity<List<PetDTO>> getAllPets() {
+        return ResponseEntity.ok(petService.getAllPets());
+    }
     @GetMapping("/{id}")
-    public ResponseEntity<Pet> getPetById(@PathVariable Long id) {
-        Optional<Pet> pet = petRepository.findById(id);
-        return pet.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<PetDTO> getPetById(@PathVariable Long id) {
+       return ResponseEntity.ok(this.petService.getPetById(id));
+    }
+    @GetMapping("/collection")
+    public ResponseEntity<List<PetDTO>> getMyPets(){
+        return ResponseEntity.ok(this.petService.getMyPets());
     }
 
     @PostMapping
-    public ResponseEntity<Pet> createPet(@RequestBody Pet pet) {
-
-        if (pet.getLife() == 0) pet.setLife(100);
-        if (pet.getHappiness() == 0) pet.setHappiness(100);
-        if (pet.getEnergy() == 0) pet.setEnergy(100);
-
-        Pet savedPet = petRepository.save(pet);
-        return ResponseEntity.ok(savedPet);
+    public ResponseEntity<PetDTO> createPet(@RequestBody PetDTO pet) {
+        return ResponseEntity.ok(this.petService.createPet(pet));
     }
-
 
     @PutMapping("/{id}")
-    public ResponseEntity<Pet> updatePet(@PathVariable Long id, @RequestBody Pet petDetails) {
-        return petRepository.findById(id)
-                .map(pet -> {
-                    pet.setName(petDetails.getName());
-                    pet.setPetColor(petDetails.getPetColor());
-                    pet.setPetType(petDetails.getPetType());
-                    pet.setEnvironment(petDetails.getEnvironment());
-                    pet.setComplement(petDetails.getComplement());
-                    pet.setLife(petDetails.getLife());
-                    pet.setHappiness(petDetails.getHappiness());
-                    pet.setEnergy(petDetails.getEnergy());
-
-                    return ResponseEntity.ok(petRepository.save(pet));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<PetDTO> updatePet(@PathVariable Long id, @RequestBody PetDTO petDetails) {
+        return ResponseEntity.ok(this.petService.updatePet( id,petDetails));
     }
-
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePet(@PathVariable Long id) {
-        return petRepository.findById(id)
-                .map(pet -> {
-                    petRepository.delete(pet);
-                    return ResponseEntity.ok().<Void>build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        this.petService.deletePet(id);
+        return ResponseEntity.noContent().build();
     }
 }

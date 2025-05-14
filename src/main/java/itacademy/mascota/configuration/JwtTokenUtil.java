@@ -2,7 +2,9 @@ package itacademy.mascota.configuration;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -11,12 +13,17 @@ import java.util.Date;
 @Component
 public class JwtTokenUtil {
 
-    private final Key secretKey = Keys.hmacShaKeyFor("mySecretKeymySecretKeymySecretKey".getBytes());
+    @Value("${mascota.jwt.secret}")
+    private String SECRET_KEY;
+    private Key getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 
 
     public String getUsernameFromToken(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
+                .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
@@ -28,6 +35,7 @@ public class JwtTokenUtil {
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .signWith(this.getSigningKey())
                 .compact();
     }
 
@@ -47,7 +55,7 @@ public class JwtTokenUtil {
 
     private Date getExpirationDateFromToken(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
+                .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()

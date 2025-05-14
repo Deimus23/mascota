@@ -1,5 +1,6 @@
-package itacademy.mascota.model;
+package itacademy.mascota.service;
 
+import itacademy.mascota.model.User;
 import itacademy.mascota.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

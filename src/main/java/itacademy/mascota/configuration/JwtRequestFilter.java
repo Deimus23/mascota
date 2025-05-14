@@ -1,6 +1,6 @@
 package itacademy.mascota.configuration;
 
-import itacademy.mascota.model.CustomUserDetailsService;
+import itacademy.mascota.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

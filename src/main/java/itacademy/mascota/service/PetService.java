@@ -1,5 +1,6 @@
 package itacademy.mascota.service;
 
+import itacademy.mascota.dto.CreatePetDTO;
 import itacademy.mascota.dto.PetDTO;
 import itacademy.mascota.model.Pet;
 import itacademy.mascota.model.User;
@@ -41,9 +42,8 @@ import java.util.stream.Collectors;
                     .toList();
         }
 
-        public PetDTO createPet(PetDTO petDTO) {
-            Pet pet = convertToEntity(petDTO);
-            initializeDefaults(pet);
+        public PetDTO createPet(CreatePetDTO petDTO) {
+            Pet pet = this.initializeNewPet(petDTO);
             Pet saved = petRepository.save(pet);
             return convertToDTO(saved);
         }
@@ -66,12 +66,6 @@ import java.util.stream.Collectors;
             }).orElse(false);
         }
 
-        private void initializeDefaults(Pet pet) {
-            if (pet.getLife() == 0) pet.setLife(100);
-            if (pet.getHappiness() == 0) pet.setHappiness(100);
-            if (pet.getEnergy() == 0) pet.setEnergy(100);
-        }
-
         public PetDTO convertToDTO(Pet pet) {
             if (pet == null) return null;
 
@@ -88,21 +82,19 @@ import java.util.stream.Collectors;
             );
         }
 
-        public Pet convertToEntity(PetDTO dto) {
-            if (dto == null) return null;
+        private Pet initializeNewPet(CreatePetDTO petDTO) {
+            Pet newPet = new Pet();
+            //init values from dto
+            newPet.setName(petDTO.getName());
+            newPet.setPetType(petDTO.getPetType());
+            newPet.setPetColor(petDTO.getPetColor());
+            newPet.setComplement(petDTO.getComplement());
 
-            Pet pet = new Pet();
-            pet.setId(dto.getId());
-            pet.setName(dto.getName());
-            pet.setPetColor(dto.getPetColor());
-            pet.setPetType(dto.getPetType());
-            pet.setEnvironment(dto.getEnvironment());
-            pet.setComplement(dto.getComplement());
-            pet.setLife(dto.getLife());
-            pet.setHappiness(dto.getHappiness());
-            pet.setEnergy(dto.getEnergy());
-
-            return pet;
+            //init default values
+            newPet.setHappiness(100);
+            newPet.setEnergy(100);
+            newPet.setLife(100);
+            return newPet;
         }
 
     }

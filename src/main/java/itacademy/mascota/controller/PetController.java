@@ -1,5 +1,6 @@
 package itacademy.mascota.controller;
 
+import itacademy.mascota.dto.CreatePetDTO;
 import itacademy.mascota.dto.PetDTO;
 import itacademy.mascota.repository.PetRepository;
 import itacademy.mascota.service.PetService;
@@ -33,7 +34,7 @@ public class PetController {
     }
 
     @PostMapping
-    public ResponseEntity<PetDTO> createPet(@RequestBody PetDTO pet) {
+    public ResponseEntity<PetDTO> createPet(@RequestBody CreatePetDTO pet) {
         return ResponseEntity.ok(this.petService.createPet(pet));
     }
 
